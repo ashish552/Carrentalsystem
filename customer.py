@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 class CustomerManager:
     def __init__(self, db_name='car_rental.db'):
@@ -26,8 +27,14 @@ class CustomerManager:
         self.view_available_cars()
         try:
             car_id = int(input("Car ID to book: "))
-            start_date = input("Start date (YYYY-MM-DD): ")
-            end_date = input("End date (YYYY-MM-DD): ")
+            start_input = input("Start date (YYYY-MM-DD): ")
+            end_input = input("End date (YYYY-MM-DD): ")
+
+            start_date = datetime.strptime(start_input, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_input, "%Y-%m-%d").date()
+
+            if start_date >= end_date:
+                print("End date must be after start date. ")
         except ValueError:
             print("Invalid input.")
             return
@@ -35,6 +42,6 @@ class CustomerManager:
         with sqlite3.connect(self.db_name) as conn:
             conn.execute(
                 "INSERT INTO rentals (user_id, car_id, start_date, end_date, status) VALUES (?, ?, ?, ?, 'pending')",
-                (user_id, car_id, start_date, end_date)
+                (user_id, car_id, str(start_date), str(end_date))
             )
             print("Booking requested.")

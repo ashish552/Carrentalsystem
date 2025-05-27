@@ -22,7 +22,8 @@ def init_db():
         mileage INTEGER,
         available INTEGER,
         min_rent_days INTEGER,
-        max_rent_days INTEGER
+        max_rent_days INTEGER,
+        daily_rate REAL
     )''')
 
     # Rentals table
@@ -33,6 +34,7 @@ def init_db():
         start_date TEXT,
         end_date TEXT,
         status TEXT CHECK(status IN ('pending', 'approved', 'rejected')),
+        rental_fee REAL,
         FOREIGN KEY(user_id) REFERENCES users(id),
         FOREIGN KEY(car_id) REFERENCES cars(id)
     )''')

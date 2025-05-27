@@ -12,7 +12,7 @@ class CustomerManager:
             if not cars:
                 print("No cars available.")
             for car in cars:
-                (car_id, make, model, year, mileage, available, min_days, max_days) = car
+                (car_id, make, model, year, mileage, available, min_days, max_days, daily_rate) = car
                 print(f"ID: {car_id}")
                 print(f"Make: {make}")
                 print(f"Model: {model}")
@@ -21,6 +21,7 @@ class CustomerManager:
                 print(f"Available: {'Yes' if available == 1 else 'No'}")
                 print(f"Min Rent Days: {min_days}")
                 print(f"Max Rent Days: {max_days}")
+                print(f"Daily Rate: ${daily_rate}")
                 print("-" * 40)
 
     def book_car(self, user_id):
@@ -38,10 +39,41 @@ class CustomerManager:
         except ValueError:
             print("Invalid input.")
             return
+        
+        rental_days = (end_date - start_date).days
 
         with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.execute("SELECT daily_rate, min_rent_days, max_rent_days FROM cars WHERE id = ? AND available = 1", (car_id,))
+            result = cursor.fetchone()
+            if not result:
+                print("car not found or not available.")
+                return
+            
+            daily_rate, min_days, max_days = result
+
+            if daily_rate is None:
+                print("Error: Daily rate for this car is not set. ")
+                return
+            
+            if rental_days < min_days or rental_days > max_days:
+                print(f"Rental duration must be between {min_days} and {max_days} days. ")
+                return
+            
+            additional_charge = 0
+            rental_fee = rental_days * daily_rate + additional_charge
+
+            print(f"Rental duration: {rental_days} day(s)")
+            print(f"Daily Rate: ${daily_rate:.2f}")
+            print(f"Additional Charges: ${additional_charge:.2f}")
+            print(f"Total Rental Fee: ${rental_fee:.2f}")
+
+            confirm = input("Do you want to proceed with th booking? (yes/no): ").lower()
+            if confirm != 'yes':
+                print("Booking cancelled.")
+                return
+            
             conn.execute(
-                "INSERT INTO rentals (user_id, car_id, start_date, end_date, status) VALUES (?, ?, ?, ?, 'pending')",
-                (user_id, car_id, str(start_date), str(end_date))
+                "INSERT INTO rentals (user_id, car_id, start_date, end_date, status, rental_fee) VALUES (?, ?, ?, ?, 'pending', ?)",
+                (user_id, car_id, str(start_date), str(end_date), rental_fee)
             )
             print("Booking requested.")

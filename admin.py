@@ -22,7 +22,24 @@ class AdminManager:
             print("Car added.")
 
     def update_car(self):
-        car_id = int(input("Car ID: "))
+        
+        while True:
+            car_id_input = input("Car ID: ")
+            try:
+                car_id = int(car_id_input)
+            except ValueError:
+                print("Invalid input. Please enter a valid integer ID. ")
+                continue
+
+            with sqlite3.connect(self.db_name) as conn:
+                cursor = conn.execute("SELECT id FROM cars WHERE id = ?", (car_id,))
+                result = cursor.fetchone()
+                if result:
+                    break
+                else:
+                    print("Car ID not found. Please enter a valid ID.")
+
+        
         allowed_fields = {
             "make", 'model', 'year', 'mileage', 'available', 'min_rent_days', 'max_rent_days'
         }
@@ -52,10 +69,20 @@ class AdminManager:
             print("Car updated.")
 
     def delete_car(self):
-        car_id = int(input("Car ID: "))
+        while True:
+            car_id_input = input("Car ID: ")
+            try:
+                car_id = int(car_id_input)
+                break
+            except ValueError:
+                print("Invalid input. Please enter a valid integer ID. ")
+
         with sqlite3.connect(self.db_name) as conn:
-            conn.execute("DELETE FROM cars WHERE id = ?", (car_id,))
-            print("Car deleted.")
+            cursor = conn.execute("DELETE FROM cars WHERE id = ?", (car_id,))
+            if cursor.rowcount > 0:
+                print("Car deleted. ")
+            else:
+                print("Car ID not found.")
 
     def manage_bookings(self):
         with sqlite3.connect(self.db_name) as conn:

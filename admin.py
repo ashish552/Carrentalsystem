@@ -12,11 +12,12 @@ class AdminManager:
         available = int(input("Available (1=Yes, 0=No): "))
         min_days = int(input("Min rental days: "))
         max_days = int(input("Max rental days: "))
+        daily_rate = float(input("Enter daily rental rate: "))
         with sqlite3.connect(self.db_name) as conn:
             conn.execute(
-                "INSERT INTO cars (make, model, year, mileage, available, min_rent_days, max_rent_days) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (make, model, year, mileage, available, min_days, max_days)
+                "INSERT INTO cars (make, model, year, mileage, available, min_rent_days, max_rent_days, daily_rate) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (make, model, year, mileage, available, min_days, max_days, daily_rate)
             )
             print("Car added.")
 
@@ -77,17 +78,18 @@ class AdminManager:
                     End Date     = {end_date}
                     Status       = {status}
                         """)
-            while True:
-                user_input = input("Rental ID to manage: ")
-                try:
-                    rental_id = int(user_input)
-                    cursor = conn.execute("SELECT id FROM rentals WHERE id = ? AND status = 'pending'", (rental_id,))
-                    if cursor.fetchone() is None:
-                        print("Rental ID cannot found or already processed. Please enter a valid pending Rental ID.")
-                        continue
-                    break
-                except ValueError:
-                    print('Invalid ID. Please enter a number..')
+           
+            user_input = input("Rental ID to manage: ")
+            try:
+                rental_id = int(user_input)
+                cursor = conn.execute("SELECT id FROM rentals WHERE id = ? AND status = 'pending'", (rental_id,))
+                if cursor.fetchone() is None:
+                    print("Rental ID cannot found or already processed. Please enter a valid pending Rental ID.")
+                    return
+            
+            except ValueError:
+                print('Invalid ID. Please enter a number..')
+                return
 
             while True:
                  decision = input("Approve or reject: ").lower()

@@ -2,9 +2,10 @@ import sqlite3
 
 class AdminManager:
     def __init__(self, db_name='car_rental.db'):
-        self.db_name = db_name
+        self.db_name = db_name #Name of the SQLite database File
 
     def add_car(self):
+        #Get car details from the admin 
         make = input("Make: ")
         model = input("Model: ")
         year = int(input("Year: "))
@@ -22,7 +23,7 @@ class AdminManager:
             print("Car added.")
 
     def update_car(self):
-        
+        # Repeatedly ask for a valid car ID until found
         while True:
             car_id_input = input("Car ID: ")
             try:
@@ -68,6 +69,8 @@ class AdminManager:
             conn.execute(f"UPDATE cars SET {field} = ? WHERE id = ?", (value, car_id))
             print("Car updated.")
 
+
+    # Delete the car from the database
     def delete_car(self):
         while True:
             car_id_input = input("Car ID: ")
@@ -130,6 +133,6 @@ class AdminManager:
                      print("Invalid decision. Please type 'approve' or 'reject'. ")
 
 
-           
+            # Update rental status
             conn.execute("UPDATE rentals SET status = ? WHERE id  = ?", (status, rental_id))
             print(f"Rental ID {rental_id} has been {status}.")

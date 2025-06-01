@@ -1,21 +1,24 @@
+# Import required classes and functions from other modules
 from database import init_db
 from user import UserManager
 from admin import AdminManager
 from customer import CustomerManager
 
+# Menu shown to all users initially
 def menu():
-
     print(" \n---- user manager -------")
     print("1. Register")
     print("2. Login")
     print("3. Exit")
 
+# Main function that controls the program flow
 def main():
     user_manager = UserManager()
     customer_manager = CustomerManager()
     admin_manager = AdminManager()
     init_db()
 
+    # Infinite loop for the main menu
     while True:
         menu()
         choice = input("Select an option(1-3): ")
@@ -23,6 +26,7 @@ def main():
             user_manager.register()
         elif choice == "2":
             user = user_manager.login()
+            # If login is successful, proceed based on user role
             if user:
                 user_id, _, role = user
                 if role == "admin":
@@ -45,10 +49,10 @@ def main():
                             customer_manager.view_available_cars()
                         elif cust_action == '2':
                             customer_manager.book_car(user_id)
-                        elif cust_action == '3':
+                        elif cust_action == '3': # Log out customer
                             break
         elif choice == "3":
-            break
+            break # Exit the application
 
 if __name__ == "__main__":
     main()

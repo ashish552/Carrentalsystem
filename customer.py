@@ -5,6 +5,7 @@ class CustomerManager:
     def __init__(self, db_name='car_rental.db'):
         self.db_name = db_name
 
+     # Display all available cars (available = 1)
     def view_available_cars(self):
         with sqlite3.connect(self.db_name) as conn:
             cur = conn.execute("SELECT * FROM cars WHERE available = 1")
@@ -24,6 +25,7 @@ class CustomerManager:
                 print(f"Daily Rate: ${daily_rate}")
                 print("-" * 40)
 
+    #Book the car with ID
     def book_car(self, user_id):
         self.view_available_cars()
         try:
@@ -67,6 +69,7 @@ class CustomerManager:
             print(f"Additional Charges: ${additional_charge:.2f}")
             print(f"Total Rental Fee: ${rental_fee:.2f}")
 
+            #Confirm Booking
             confirm = input("Do you want to proceed with th booking? (yes/no): ").lower()
             if confirm != 'yes':
                 print("Booking cancelled.")
